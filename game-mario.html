@@ -1,28 +1,3 @@
-The current game resets to Level 1 upon failure (e.g., hitting a spike or falling off the screen), which is not ideal for gameplay progression. The request is to modify the game so that if the player fails at Level 2 (or any level), they resume from the same level instead of restarting from Level 1. Additionally, we need to ensure the persistent issue of Mario moving on its own after level transitions (noted after Level 1) is fully resolved, as it may still occur during level retries.
-
-### Changes
-1. **Resume from Same Level on Failure**:
-   - Modify the `endGame` function to store the current level before showing the game over screen.
-   - Update the `resetGame` function to reload the current level (instead of resetting to Level 1) while resetting the player's position, score, and level state (e.g., coins, obstacles).
-   - Ensure `loadLevel` is called with the current level index in `resetGame` to restart the same level.
-
-2. **Reinforce Fix for Mario Moving on Its Own**:
-   - Retain the existing safeguards from the previous version:
-     - Reset `player.dx` and `keys` in `loadLevel` and `resetGame`.
-     - Force `player.dx = 0` for the first 10 frames of a new level in `updatePlayer`.
-     - Clear key event listeners and re-add them in `loadLevel`.
-     - Skip micro-movements (`dx` < 0.01) when no keys are pressed.
-   - Add an additional check in `gameLoop` to log and reset `player.dx` if it’s non-zero without input during the first 20 frames of a level, providing an extra layer of protection.
-   - Increase the initial no-movement frame buffer in `updatePlayer` from 10 to 20 frames to account for any delayed input processing during level retries.
-
-3. **Preserve All Other Features**:
-   - Maintain the challenging level designs with moving platforms, corrected spike placements, and coin/goal positions.
-   - Keep gravity (0.3), jump power (-14), animations (landing bounce, coin bobbing), and shape-based rendering (blue rectangle for player, gold circles for coins).
-   - Retain `e.preventDefault()`, canvas focus, and debug logs for obstacles, `dx`, and `keys` to aid troubleshooting.
-
-Since this is an update to the existing game, I’ll use the same artifact_id. The primary change is to resume from the failed level, with reinforced fixes to prevent unintended movement during level retries or transitions.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
